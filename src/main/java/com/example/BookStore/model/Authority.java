@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 @Setter
@@ -14,14 +13,15 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "authorities")
-public class Authority {
+public class Authority implements GrantedAuthority {
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer  id;
 
     @Column(name = "authority")
     private String authority;
 
-    @ManyToMany(mappedBy = "authorities", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<User> users;
+//    @ManyToMany(mappedBy = "authorities", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+//    private List<User> users;
 }

@@ -18,7 +18,8 @@ import java.util.List;
 public class Order {
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer  id;
 
     @Column(name = "dateCreate")
     private LocalDateTime dateCreate;

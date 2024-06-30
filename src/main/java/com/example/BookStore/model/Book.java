@@ -17,7 +17,8 @@ import java.util.List;
 public class Book {
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer  id;
 
     @Column(name = "name")
     private String name;
