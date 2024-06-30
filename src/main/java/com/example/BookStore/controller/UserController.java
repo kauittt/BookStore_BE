@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
 @RestController
-
+@RequestMapping("/api/auth")
 public class UserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -56,13 +57,4 @@ public class UserController {
         }
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
-        User user = userService.getUserByUsername(loginRequest.getUsername());
-        if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return ResponseEntity.ok("Login successful");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-        }
-    }
 }
