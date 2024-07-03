@@ -1,5 +1,6 @@
 package com.example.BookStore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class Book {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer  id;
+    private Integer id;
 
     @Column(name = "name")
     private String name;
@@ -38,6 +39,8 @@ public class Book {
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "orderId")
     )
+//    @JsonBackReference(value = "order-book")
+    @JsonIgnore
     private List<Order> orders;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -46,7 +49,10 @@ public class Book {
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "cartId")
     )
+//    @JsonBackReference(value = "cart-book")
+    @JsonIgnore
     private List<Cart> carts;
+
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
@@ -54,5 +60,7 @@ public class Book {
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "authorId")
     )
+//    @JsonBackReference(value = "author-book")
+    @JsonIgnore
     private List<Author> authors;
 }

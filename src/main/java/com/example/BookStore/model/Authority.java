@@ -1,11 +1,14 @@
 package com.example.BookStore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,6 +25,8 @@ public class Authority implements GrantedAuthority {
     @Column(name = "authority")
     private String authority;
 
-//    @ManyToMany(mappedBy = "authorities", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-//    private List<User> users;
+    @ManyToMany(mappedBy = "authorities", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+//    @JsonBackReference(value = "user-authority")
+    @JsonIgnore
+    private List<User> users;
 }

@@ -22,6 +22,11 @@ public class AuthorityService {
         return authorityRepository.findAll();
     }
 
+    @Transactional
+    public List<Authority> getAllAuthoritiesByUsername(String username) {
+        return authorityRepository.findAuthoritiesByUsername(username);
+    }
+
     public Optional<Authority> getAuthorityById(String id) {
         return authorityRepository.findById(id);
     }

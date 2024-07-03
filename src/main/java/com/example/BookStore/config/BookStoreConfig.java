@@ -6,23 +6,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableWebSecurity
-public class BookStoreConfig {
-
-    private final DataSource dataSource;
+public class BookStoreConfig   {
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public BookStoreConfig(DataSource dataSource, UserDetailsService userDetailsService) {
-        this.dataSource = dataSource;
+    public BookStoreConfig( UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -30,7 +26,7 @@ public class BookStoreConfig {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;
     }
@@ -45,8 +41,7 @@ public class BookStoreConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .formLogin().permitAll()
                 .and()
@@ -54,19 +49,5 @@ public class BookStoreConfig {
 
         return http.build();
     }
-
-
-    //    @Bean
-    //    public UserDetailsManager userDetailsManager() {
-    //        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-    //        jdbcUserDetailsManager.setUsersByUsernameQuery("select username, password, enabled from users where username = ?");
-    //        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
-    //                "select U.username, A.authority from users_authorities UA " +
-    //                        "join authorities A on UA.authorityId = A.id " +
-    //                        "join users U on U.id = UA.userId " +
-    //                        "where U.username = ?"
-    //        );
-    //        return jdbcUserDetailsManager;
-    //    }
 
 }
