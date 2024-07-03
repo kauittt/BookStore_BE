@@ -40,7 +40,7 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "orderId")
     )
 //    @JsonBackReference(value = "order-book")
-    @JsonIgnore
+//    @JsonIgnore
     private List<Order> orders;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -50,7 +50,7 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "cartId")
     )
 //    @JsonBackReference(value = "cart-book")
-    @JsonIgnore
+//    @JsonIgnore
     private List<Cart> carts;
 
 

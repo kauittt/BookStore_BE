@@ -1,6 +1,5 @@
 package com.example.BookStore.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,7 +50,7 @@ public class User {
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 //    @JsonBackReference(value = "user-authority")
-    @JsonIgnore
+//    @JsonIgnore
     @JoinTable(
             name = "users_authorities",
             joinColumns = @JoinColumn(name = "userId"),

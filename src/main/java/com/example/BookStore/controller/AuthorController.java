@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+//! add empty []
 
 @RestController
 @RequestMapping("/authors")
@@ -50,6 +53,11 @@ public class AuthorController {
     @PostMapping
     public ResponseEntity<?> createAuthor(@RequestBody AuthorDTO authorDTO) {
         try {
+            List<String> bookIdsAsString = authorDTO.getBooks().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+            authorDTO.setBooks(bookIdsAsString);
+
             AuthorDTO createdAuthor = authorService.createAuthor(authorDTO);
             return ResponseEntity.ok(createdAuthor);
         } catch (Exception ex) {
@@ -61,6 +69,11 @@ public class AuthorController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAuthor(@PathVariable String id, @RequestBody AuthorDTO authorDTO) {
         try {
+            List<String> bookIdsAsString = authorDTO.getBooks().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+            authorDTO.setBooks(bookIdsAsString);
+
             AuthorDTO updatedAuthor = authorService.updateAuthor(id, authorDTO);
             return ResponseEntity.ok(updatedAuthor);
         } catch (Exception ex) {
