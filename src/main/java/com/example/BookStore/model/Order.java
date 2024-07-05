@@ -19,16 +19,22 @@ public class Order {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer  id;
+    private Integer id;
 
     @Column(name = "dateCreate")
     private LocalDateTime dateCreate;
 
-    @Column(name = "total")
-    private double total;
+    @Column(name = "dateUpdate")
+    private LocalDateTime dateUpdate;
 
-    @Column(name = "quantity")
-    private double quantity;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "userId")

@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 @Setter
 @Getter
 public class Response {
-    private int status;
+    private Integer status;
     private String timestamp;
     private String message;
 

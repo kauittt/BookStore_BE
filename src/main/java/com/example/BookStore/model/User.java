@@ -28,7 +28,7 @@ public class User {
     private String password;
 
     @Column(name = "enabled")
-    private int enabled;
+    private Integer enabled;
 
     @Column(name = "email")
     private String email;
@@ -42,11 +42,11 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "dateCreated")
-    private LocalDateTime dateCreated;
+    @Column(name = "dateCreate")
+    private LocalDateTime dateCreate;
 
-    @Column(name = "dateUpdated")
-    private LocalDateTime dateUpdated;
+    @Column(name = "dateUpdate")
+    private LocalDateTime dateUpdate;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 //    @JsonBackReference(value = "user-authority")

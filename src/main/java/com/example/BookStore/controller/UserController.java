@@ -31,8 +31,8 @@ public class UserController {
         try {
             String hashedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(hashedPassword);
-            user.setDateCreated(LocalDateTime.now());
-            user.setDateUpdated(LocalDateTime.now());
+            user.setDateCreate(LocalDateTime.now());
+            user.setDateUpdate(LocalDateTime.now());
             user.setEnabled(1);
 
             User savedUser = userService.saveUser(user);
@@ -75,7 +75,7 @@ public class UserController {
             User updatedUser = user.get();
             updatedUser.setUsername(userDetails.getUsername());
             updatedUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-            updatedUser.setDateUpdated(LocalDateTime.now());
+            updatedUser.setDateUpdate(LocalDateTime.now());
             updatedUser.setEnabled(userDetails.getEnabled());
             // Update other fields as needed
 

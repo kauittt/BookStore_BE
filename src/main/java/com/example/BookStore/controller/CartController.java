@@ -1,13 +1,14 @@
 package com.example.BookStore.controller;
 
-import com.example.BookStore.model.Cart;
+import com.example.BookStore.DTO.CartDTO;
+import com.example.BookStore.model.Response;
 import com.example.BookStore.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/carts")
@@ -20,37 +21,51 @@ public class CartController {
     }
 
     @GetMapping
-    public List<Cart> getAllCarts() {
-        return cartService.getAllCarts();
+    public ResponseEntity<List<CartDTO>> getAllCarts() {
+        return ResponseEntity.ok(cartService.getAllCarts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cart> getCartById(@PathVariable String id) {
-        Optional<Cart> cart = cartService.getCartById(id);
-        return cart.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public Cart createCart(@RequestBody Cart cart) {
-        return cartService.saveCart(cart);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Cart> updateCart(@PathVariable String id, @RequestBody Cart cartDetails) {
-        Optional<Cart> cart = cartService.getCartById(id);
-        if (cart.isPresent()) {
-            Cart updatedCart = cart.get();
-            // Update fields here
-            return ResponseEntity.ok(cartService.saveCart(updatedCart));
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getCartById(@PathVariable String id) {
+        try {
+            CartDTO cartDTO = cartService.getCartById(id);
+            return ResponseEntity.ok(cartDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCart(@PathVariable String id) {
-        cartService.deleteCart(id);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/add/{id}")
+    public ResponseEntity<?> addBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
+        try {
+            CartDTO updatedCart = cartService.addBooksByIds(id, cartDTO);
+            return ResponseEntity.ok(updatedCart);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PutMapping("/remove/{id}")
+    public ResponseEntity<?> removeBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
+        try {
+            CartDTO updatedCart = cartService.removeBooksByIds(id, cartDTO);
+            return ResponseEntity.ok(updatedCart);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PutMapping("/clean/{id}")
+    public ResponseEntity<?> cleanCart(@PathVariable String id) {
+        try {
+            CartDTO cartDTO = cartService.cleanCart(id);
+            return ResponseEntity.ok(cartDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 }

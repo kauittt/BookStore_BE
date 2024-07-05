@@ -1,10 +1,8 @@
 package com.example.BookStore.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Data
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,4 +17,9 @@ public class BookDTO {
     private String description;
 
     private double price;
+
+    private String author;
+
+    private int quantity;
+
 }

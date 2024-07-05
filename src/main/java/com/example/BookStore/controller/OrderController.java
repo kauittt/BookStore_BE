@@ -1,13 +1,14 @@
 package com.example.BookStore.controller;
 
-import com.example.BookStore.model.Order;
+import com.example.BookStore.DTO.OrderDTO;
+import com.example.BookStore.model.Response;
 import com.example.BookStore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
@@ -20,37 +21,51 @@ public class OrderController {
     }
 
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable String id) {
-        Optional<Order> order = orderService.getOrderById(id);
-        return order.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> getOrderById(@PathVariable String id) {
+        try {
+            OrderDTO orderDTO = orderService.getOrderById(id);
+            return ResponseEntity.ok(orderDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.saveOrder(order);
+    public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDTO) {
+        try {
+            OrderDTO savedOrder = orderService.createOrder(orderDTO);
+            return ResponseEntity.ok(savedOrder);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable String id, @RequestBody Order orderDetails) {
-        Optional<Order> order = orderService.getOrderById(id);
-        if (order.isPresent()) {
-            Order updatedOrder = order.get();
-            // Update fields here
-            return ResponseEntity.ok(orderService.saveOrder(updatedOrder));
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateOrder(@PathVariable String id, @RequestBody OrderDTO orderDTO) {
+        try {
+            OrderDTO savedOrder = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(savedOrder);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
-        orderService.deleteOrder(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteOrder(@PathVariable String id) {
+        try {
+            OrderDTO orderDTO = orderService.deleteOrder(id);
+            return ResponseEntity.ok(orderDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 }
