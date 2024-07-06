@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -44,7 +45,12 @@ public class CartService {
     public CartDTO addBooksByIds(String id, CartDTO cartDTO) {
         Cart cartDB = findCartById(id);
 
-        List<Book> books = bookMapper.toListEntity(cartDB.getBooks(), bookRepository);
+        List<String> bookIdsAsString = cartDTO.getBooks().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+        cartDTO.setBooks(bookIdsAsString);
+
+        List<Book> books = bookMapper.toListEntity(cartDTO.getBooks(), bookRepository);
         for (Book book : books) {
             if (!book.getCarts().contains(cartDB)) {
                 book.getCarts().add(cartDB);
@@ -60,7 +66,12 @@ public class CartService {
     public CartDTO removeBooksByIds(String id, CartDTO cartDTO) {
         Cart cartDB = findCartById(id);
 
-        List<Book> books = bookMapper.toListEntity(cartDB.getBooks(), bookRepository);
+        List<String> bookIdsAsString = cartDTO.getBooks().stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+        cartDTO.setBooks(bookIdsAsString);
+
+        List<Book> books = bookMapper.toListEntity(cartDTO.getBooks(), bookRepository);
         for (Book book : books) {
             book.getCarts().remove(cartDB);
         }
@@ -81,5 +92,23 @@ public class CartService {
         cart.getBooks().clear();
 
         return cartMapper.toDTO(cartRepository.save(cart));
+    }
+
+    @Transactional
+    public CartDTO deleteCart(String id) {
+        Cart cart = findCartById(id);
+
+        if (cart.getBooks() != null) {
+            //- Remove Book's references
+            for (Book book : cart.getBooks()) {
+                book.getCarts().remove(cart);
+            }
+            cart.getBooks().clear();
+        }
+
+        cart.setUser(null);
+
+        cartRepository.delete(cart);
+        return cartMapper.toDTO(cart);
     }
 }

@@ -49,10 +49,13 @@ public class OrderService {
     public OrderDTO deleteOrder(String id) {
         Order order = findOrderById(id);
 
-        for (Book book : order.getBooks()) {
-            book.getOrders().remove(order);
+        if (order.getBooks() != null) {
+            for (Book book : order.getBooks()) {
+                book.getOrders().remove(order);
+            }
+            order.getBooks().clear();
         }
-        order.getBooks().clear();
+
 
         order.getUser().getOrders().remove(order);
         order.setUser(null);

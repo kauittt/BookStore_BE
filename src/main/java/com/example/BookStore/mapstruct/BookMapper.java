@@ -30,6 +30,7 @@ public interface BookMapper {
     //- Convert List<ID> -> List<Book>:
     //! Dùng khi REQUEST
     default List<Book> toListEntity(List<?> bookIds, BookRepository bookRepository) {
+
         return bookIds.stream()
                 .map(bookId -> bookRepository.findById((String) bookId)
                         .orElseThrow(() -> new RuntimeException(Response.notFound("Book", (String) bookId))))

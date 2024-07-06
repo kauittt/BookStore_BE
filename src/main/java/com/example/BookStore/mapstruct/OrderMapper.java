@@ -69,6 +69,18 @@ public interface OrderMapper {
 
         user.getOrders().add(order);
         order.setUser(user);
+
+        if (order.getName() == null) {
+            order.setName(user.getName());
+        }
+
+        if (order.getAddress() == null) {
+            order.setAddress(user.getAddress());
+        }
+
+        if (order.getPhone() == null) {
+            order.setPhone(user.getPhone());
+        }
         return order;
     }
 }

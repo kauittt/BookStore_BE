@@ -84,6 +84,7 @@ public class BookService {
         }
         book.getOrders().clear();
 
+        bookRepository.delete(book);
         return bookMapper.toDTO(book);
     }
 }
