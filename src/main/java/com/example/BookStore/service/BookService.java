@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 public class BookService {
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
     private final BookMapper bookMapper = BookMapper.INSTANCE;
 
     @Autowired
