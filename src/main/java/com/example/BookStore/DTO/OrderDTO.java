@@ -1,5 +1,6 @@
 package com.example.BookStore.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,14 @@ public class OrderDTO {
     private LocalDateTime dateCreate;
     private LocalDateTime dateUpdate;
     //- Input
-    private int user;
+    private Integer user;
     private List<?> books;
     private String name;
     private String phone;
     private String address;
+
+    @JsonIgnore
+    public Integer getUser() {
+        return user;
+    }
 }
