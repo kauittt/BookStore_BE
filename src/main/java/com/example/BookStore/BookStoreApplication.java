@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BookStoreApplication {
-	//! Xem CartDTO
 	//! Cart-Book có thêm quantity k
 
 	public static void main(String[] args) {
