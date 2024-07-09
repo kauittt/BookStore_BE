@@ -1,28 +1,94 @@
 package com.example.BookStore.controller;
 
+import com.example.BookStore.DTO.JwtAuthResponse;
 import com.example.BookStore.DTO.UserRegistryDTO;
 import com.example.BookStore.DTO.UserResponseDTO;
 import com.example.BookStore.model.Response;
+import com.example.BookStore.security.JWTGenerator;
+import com.example.BookStore.service.CustomUserDetailsService;
 import com.example.BookStore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTGenerator jwtGenerator;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager
+            , JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtGenerator = jwtGenerator;
+        this.customUserDetailsService = customUserDetailsService;
     }
+
+//    @PostMapping(value = "/login")
+//    public ResponseEntity<?> login(@RequestBody UserRegistryDTO userRegistryDTO) {
+//        try {
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(userRegistryDTO.getUsername(), userRegistryDTO.getPassword())
+//            );
+//
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//            String token = jwtGenerator.generateToken(authentication);
+//            return ResponseEntity.ok(new JwtAuthResponse(token));
+//        } catch (Exception ex) {
+//            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//        }
+//    }
+
+    @PostMapping(value = "/login")
+    public ResponseEntity<?> login(@RequestBody UserRegistryDTO userRegistryDTO) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userRegistryDTO.getUsername(), userRegistryDTO.getPassword())
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtGenerator.generateToken(authentication);
+            String refreshToken = jwtGenerator.generateRefreshToken(authentication);
+            return ResponseEntity.ok(new JwtAuthResponse(token, refreshToken));
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping(value = "/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        try {
+            String refreshToken = request.get("refreshToken");
+            if (jwtGenerator.validateToken(refreshToken)) {
+                String username = jwtGenerator.getUsernameFromJWT(refreshToken);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, jwtGenerator.getAuthoritiesFromJWT(refreshToken));
+                String newToken = jwtGenerator.generateToken(authentication);
+                String newRefreshToken = jwtGenerator.generateRefreshToken(authentication);
+                return ResponseEntity.ok(new JwtAuthResponse(newToken, newRefreshToken));
+            } else {
+                Response response = Response.of(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegistryDTO userRegistryDTO) {
