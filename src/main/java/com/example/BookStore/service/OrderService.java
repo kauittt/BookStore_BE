@@ -5,6 +5,7 @@ import com.example.BookStore.mapstruct.BookMapper;
 import com.example.BookStore.mapstruct.OrderMapper;
 import com.example.BookStore.model.Book;
 import com.example.BookStore.model.Order;
+import com.example.BookStore.model.OrderBook;
 import com.example.BookStore.model.Response;
 import com.example.BookStore.repository.BookRepository;
 import com.example.BookStore.repository.OrderRepository;
@@ -49,19 +50,38 @@ public class OrderService {
     public OrderDTO deleteOrder(String id) {
         Order order = findOrderById(id);
 
-        if (order.getBooks() != null) {
-            for (Book book : order.getBooks()) {
-                book.getOrders().remove(order);
+        if (order.getOrderBooks() != null) {
+            // Remove OrderBook references
+            for (OrderBook orderBook : order.getOrderBooks()) {
+                Book book = orderBook.getBook();
+                book.getOrderBooks().remove(orderBook);
             }
-            order.getBooks().clear();
+            order.getOrderBooks().clear();
         }
 
 
-        order.getUser().getOrders().remove(order);
-        order.setUser(null);
+        if (order.getUser() != null) {
+            order.getUser().getOrders().remove(order);
+            order.setUser(null);
+        }
 
         orderRepository.delete(order);
         return orderMapper.toDTO(order);
+//        Order order = findOrderById(id);
+//
+//        if (order.getBooks() != null) {
+//            for (Book book : order.getBooks()) {
+//                book.getOrders().remove(order);
+//            }
+//            order.getBooks().clear();
+//        }
+//
+//
+//        order.getUser().getOrders().remove(order);
+//        order.setUser(null);
+//
+//        orderRepository.delete(order);
+//        return orderMapper.toDTO(order);
     }
 
     @Transactional
@@ -76,6 +96,7 @@ public class OrderService {
 
 
         Order order = orderMapper.toEntityWithBooksAndUser(orderDTO, bookRepository, userRepository);
+        order.setId(null);
         return orderMapper.toDTOWithBooks(orderRepository.save(order));
     }
 

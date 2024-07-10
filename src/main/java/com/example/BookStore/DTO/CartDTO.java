@@ -1,6 +1,6 @@
 package com.example.BookStore.DTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
@@ -12,11 +12,22 @@ import java.util.List;
 @NoArgsConstructor
 public class CartDTO {
     private Integer id;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer user;
+
     private List<?> books;
 
-    @JsonIgnore
-    public Integer getUser() {
-        return user;
-    }
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private List<Integer> quantities;
+
+//    @JsonIgnore
+//    public Integer getUser() {
+//        return user;
+//    }
+//
+//    @JsonIgnore
+//    public List<Integer> getQuantities() {
+//        return quantities;
+//    }
 }

@@ -2,10 +2,7 @@ package com.example.BookStore.service;
 
 import com.example.BookStore.DTO.BookDTO;
 import com.example.BookStore.mapstruct.BookMapper;
-import com.example.BookStore.model.Book;
-import com.example.BookStore.model.Cart;
-import com.example.BookStore.model.Order;
-import com.example.BookStore.model.Response;
+import com.example.BookStore.model.*;
 import com.example.BookStore.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,8 +37,9 @@ public class BookService {
     @Transactional
     public BookDTO createBook(BookDTO bookDTO) {
         Book book = bookMapper.toEntity(bookDTO);
-        book.setCarts(new ArrayList<>());
-        book.setOrders(new ArrayList<>());
+        book.setCartBooks(new ArrayList<>());
+        book.setOrderBooks(new ArrayList<>());
+        book.setId(null);
         return bookMapper.toDTO(bookRepository.save(book));
     }
 
@@ -74,15 +72,23 @@ public class BookService {
     public BookDTO deleteBook(String id) {
         Book book = findBookById(id);
 
-        for (Cart cart : book.getCarts()) {
-            cart.getBooks().remove(book);
+        // Remove references from CartBook
+        if (book.getCartBooks() != null) {
+            for (CartBook cartBook : book.getCartBooks()) {
+                Cart cart = cartBook.getCart();
+                cart.getCartBooks().remove(cartBook);
+            }
+            book.getCartBooks().clear();
         }
-        book.getCarts().clear();
 
-        for (Order order : book.getOrders()) {
-            order.getBooks().remove(book);
+        // Remove references from OrderBook
+        if (book.getOrderBooks() != null) {
+            for (OrderBook orderBook : book.getOrderBooks()) {
+                Order order = orderBook.getOrder();
+                order.getOrderBooks().remove(orderBook);
+            }
+            book.getOrderBooks().clear();
         }
-        book.getOrders().clear();
 
         bookRepository.delete(book);
         return bookMapper.toDTO(book);

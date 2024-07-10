@@ -36,10 +36,10 @@ public class CartController {
         }
     }
 
-    @PutMapping("/add/{id}")
-    public ResponseEntity<?> addBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
         try {
-            CartDTO updatedCart = cartService.addBooksByIds(id, cartDTO);
+            CartDTO updatedCart = cartService.updateBooksByIds(id, cartDTO);
             return ResponseEntity.ok(updatedCart);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -47,16 +47,16 @@ public class CartController {
         }
     }
 
-    @PutMapping("/remove/{id}")
-    public ResponseEntity<?> removeBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
-        try {
-            CartDTO updatedCart = cartService.removeBooksByIds(id, cartDTO);
-            return ResponseEntity.ok(updatedCart);
-        } catch (Exception ex) {
-            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
+//    @PutMapping("/remove/{id}")
+//    public ResponseEntity<?> removeBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
+//        try {
+//            CartDTO updatedCart = cartService.removeBooksByIds(id, cartDTO);
+//            return ResponseEntity.ok(updatedCart);
+//        } catch (Exception ex) {
+//            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//        }
+//    }
 
     @PutMapping("/clean/{id}")
     public ResponseEntity<?> cleanCart(@PathVariable String id) {
