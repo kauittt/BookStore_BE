@@ -13,7 +13,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "orders_books")
 public class OrderBook {
-
     @EmbeddedId
     private OrderBookId id;
 

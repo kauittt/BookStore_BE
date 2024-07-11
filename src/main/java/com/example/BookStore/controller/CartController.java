@@ -1,6 +1,7 @@
 package com.example.BookStore.controller;
 
-import com.example.BookStore.DTO.CartDTO;
+import com.example.BookStore.DTO.CartRequestDTO;
+import com.example.BookStore.DTO.CartResponseDTO;
 import com.example.BookStore.model.Response;
 import com.example.BookStore.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,14 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartDTO>> getAllCarts() {
+    public ResponseEntity<List<CartResponseDTO>> getAllCarts() {
         return ResponseEntity.ok(cartService.getAllCarts());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCartById(@PathVariable String id) {
         try {
-            CartDTO cartDTO = cartService.getCartById(id);
+            CartResponseDTO cartDTO = cartService.getCartById(id);
             return ResponseEntity.ok(cartDTO);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -37,9 +38,9 @@ public class CartController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateBooksByIds(@PathVariable String id, @RequestBody CartDTO cartDTO) {
+    public ResponseEntity<?> updateBooksByIds(@PathVariable String id, @RequestBody CartRequestDTO cartDTO) {
         try {
-            CartDTO updatedCart = cartService.updateBooksByIds(id, cartDTO);
+            CartResponseDTO updatedCart = cartService.updateBooksByIds(id, cartDTO);
             return ResponseEntity.ok(updatedCart);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -61,7 +62,7 @@ public class CartController {
     @PutMapping("/clean/{id}")
     public ResponseEntity<?> cleanCart(@PathVariable String id) {
         try {
-            CartDTO cartDTO = cartService.cleanCart(id);
+            CartResponseDTO cartDTO = cartService.cleanCart(id);
             return ResponseEntity.ok(cartDTO);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());

@@ -9,7 +9,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartRequestDTO {
+public class OrderRequestDTO {
+    private Integer userId;
     private List<String> bookIds;
     private List<String> quantities;
 }

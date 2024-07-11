@@ -1,7 +1,8 @@
 package com.example.BookStore.mapstruct;
 
-import com.example.BookStore.DTO.BookDTO;
-import com.example.BookStore.DTO.OrderDTO;
+import com.example.BookStore.DTO.OrderBookDTO;
+import com.example.BookStore.DTO.OrderRequestDTO;
+import com.example.BookStore.DTO.OrderResponseDTO;
 import com.example.BookStore.model.*;
 import com.example.BookStore.repository.BookRepository;
 import com.example.BookStore.repository.UserRepository;
@@ -9,9 +10,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface OrderMapper {
@@ -19,42 +22,41 @@ public interface OrderMapper {
     BookMapper bookMapper = BookMapper.INSTANCE;
 
     @Mapping(source = "orderBooks", target = "books", ignore = true)
-    @Mapping(source = "user", target = "user", ignore = true)
-    OrderDTO toDTO(Order order);
+    OrderResponseDTO toDTO(Order order);
 
-    @Mapping(source = "user", target = "user", ignore = true)
-    @Mapping(source = "books", target = "orderBooks", ignore = true)
-    Order toEntity(OrderDTO dto);
+    @Mapping(source = "userId", target = "user", ignore = true)
+    @Mapping(source = "bookIds", target = "orderBooks", ignore = true)
+    Order toEntity(OrderRequestDTO orderRequestDTO);
 
     //- Convert Order -> OrderDTO
     //! Dung khi RESPONSE
-    default OrderDTO toDTOWithBooks(Order order) {
-        OrderDTO orderDTO = toDTO(order);
+    default OrderResponseDTO toDTOWithBooks(Order order) {
+        OrderResponseDTO orderDTO = toDTO(order);
 
-        List<BookDTO> bookDTOs = order.getOrderBooks().stream()
-                .map(orderBook -> bookMapper.toDTO(orderBook.getBook()))
-                .toList();
-        orderDTO.setBooks(bookDTOs);
+        List<OrderBookDTO> orderBookDTOList = order.getOrderBooks().stream()
+                .map(orderBook -> new OrderBookDTO(bookMapper.toDTO(orderBook.getBook()), orderBook.getQuantity())).toList();
+
+        orderDTO.setBooks(orderBookDTOList);
 
         return orderDTO;
     }
 
-    default List<OrderDTO> toListDTOWithBooks(List<Order> orders) {
+    default List<OrderResponseDTO> toListDTOWithBooks(List<Order> orders) {
         return orders != null
-                ? orders.stream().map(this::toDTOWithBooks).toList()
+                ? orders.stream().map(this::toDTOWithBooks).collect(Collectors.toList())
                 : Collections.emptyList();
     }
 
     //- Convert OrderDTO -> Order
     //! Dùng khi REQUEST
-    default Order toEntityWithBooks(OrderDTO orderDTO, BookRepository bookRepository) {
+    default Order toEntityWithBooks(OrderRequestDTO orderDTO, BookRepository bookRepository) {
         Order order = toEntity(orderDTO);
 
-        List<Book> books = bookMapper.toListEntity(orderDTO.getBooks(), bookRepository);
+        List<Book> books = bookMapper.toListEntity(orderDTO.getBookIds(), bookRepository);
 
         for (int i = 0; i < books.size(); i++) {
             Book book = books.get(i);
-            int quantity = orderDTO.getQuantities().get(i);
+            int quantity = Integer.parseInt(orderDTO.getQuantities().get(i));
 
             OrderBookId orderBookId = new OrderBookId(order.getId(), book.getId());
             OrderBook orderBook = new OrderBook(orderBookId, order, book, quantity);
@@ -69,31 +71,24 @@ public interface OrderMapper {
             }
             order.getOrderBooks().add(orderBook);
         }
-
-
         return order;
     }
 
-    default Order toEntityWithBooksAndUser(OrderDTO orderDTO, BookRepository bookRepository, UserRepository userRepository) {
+    default Order toEntityWithBooksAndUser(OrderRequestDTO orderDTO, BookRepository bookRepository, UserRepository userRepository) {
         Order order = toEntityWithBooks(orderDTO, bookRepository);
 
-        User user = userRepository.findById(String.valueOf(orderDTO.getUser()))
-                .orElseThrow(() -> new RuntimeException(Response.notFound("User", String.valueOf(orderDTO.getUser()))));
+        User user = userRepository.findById(String.valueOf(orderDTO.getUserId()))
+                .orElseThrow(() -> new RuntimeException(Response.notFound("User", String.valueOf(orderDTO.getUserId()))));
 
         user.getOrders().add(order);
         order.setUser(user);
 
-        if (order.getName() == null) {
-            order.setName(user.getName());
-        }
-
-        if (order.getAddress() == null) {
-            order.setAddress(user.getAddress());
-        }
-
-        if (order.getPhone() == null) {
-            order.setPhone(user.getPhone());
-        }
+        //- Set các field
+        order.setDateCreate(LocalDateTime.now());
+        order.setDateUpdate(LocalDateTime.now());
+        order.setName(user.getName());
+        order.setAddress(user.getAddress());
+        order.setPhone(user.getPhone());
         return order;
     }
 }

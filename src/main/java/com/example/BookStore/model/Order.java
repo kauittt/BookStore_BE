@@ -38,14 +38,8 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "userId")
-//    @JsonBackReference(value = "user-order")
-//    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderBook> orderBooks;
-
-//    @ManyToMany(mappedBy = "orders", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-////    @JsonManagedReference(value = "order-book")
-//    private List<Book> books;
 }

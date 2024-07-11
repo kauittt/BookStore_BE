@@ -1,6 +1,7 @@
 package com.example.BookStore.service;
 
-import com.example.BookStore.DTO.OrderDTO;
+import com.example.BookStore.DTO.OrderRequestDTO;
+import com.example.BookStore.DTO.OrderResponseDTO;
 import com.example.BookStore.mapstruct.BookMapper;
 import com.example.BookStore.mapstruct.OrderMapper;
 import com.example.BookStore.model.Book;
@@ -14,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -38,16 +37,16 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException(Response.notFound("Order", id)));
     }
 
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderResponseDTO> getAllOrders() {
         return orderRepository.findAll().stream().map(orderMapper::toDTOWithBooks).toList();
     }
 
-    public OrderDTO getOrderById(String id) {
+    public OrderResponseDTO getOrderById(String id) {
         return orderMapper.toDTOWithBooks(findOrderById(id));
     }
 
     @Transactional
-    public OrderDTO deleteOrder(String id) {
+    public OrderResponseDTO deleteOrder(String id) {
         Order order = findOrderById(id);
 
         if (order.getOrderBooks() != null) {
@@ -67,57 +66,33 @@ public class OrderService {
 
         orderRepository.delete(order);
         return orderMapper.toDTO(order);
-//        Order order = findOrderById(id);
-//
-//        if (order.getBooks() != null) {
-//            for (Book book : order.getBooks()) {
-//                book.getOrders().remove(order);
-//            }
-//            order.getBooks().clear();
-//        }
-//
-//
-//        order.getUser().getOrders().remove(order);
-//        order.setUser(null);
-//
-//        orderRepository.delete(order);
-//        return orderMapper.toDTO(order);
     }
 
     @Transactional
-    public OrderDTO createOrder(OrderDTO orderDTO) {
-        orderDTO.setDateCreate(LocalDateTime.now());
-        orderDTO.setDateUpdate(LocalDateTime.now());
-
-        List<String> bookIdsAsString = orderDTO.getBooks().stream()
-                .map(String::valueOf)
-                .collect(Collectors.toList());
-        orderDTO.setBooks(bookIdsAsString);
-
-
+    public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
         Order order = orderMapper.toEntityWithBooksAndUser(orderDTO, bookRepository, userRepository);
         order.setId(null);
         return orderMapper.toDTOWithBooks(orderRepository.save(order));
     }
 
-    @Transactional
-    public OrderDTO updateOrder(String id, OrderDTO orderDTO) {
-        Order orderDB = findOrderById(id);
-
-        orderDB.setDateUpdate(LocalDateTime.now());
-
-        //- Chỉ update 2 fields
-        if (orderDTO.getName() != null) {
-            orderDB.setName(orderDTO.getName());
-        }
-
-        if (orderDTO.getPhone() != null) {
-            orderDB.setPhone(orderDTO.getPhone());
-        }
-
-
-        return orderMapper.toDTOWithBooks(orderRepository.save(orderDB));
-    }
+//    @Transactional
+//    public OrderResponseDTO updateOrder(String id, OrderRequestDTO orderDTO) {
+//        Order orderDB = findOrderById(id);
+//
+//        orderDB.setDateUpdate(LocalDateTime.now());
+//
+//        //- Chỉ update 2 fields
+//        if (orderDTO.g() != null) {
+//            orderDB.setName(orderDTO.getName());
+//        }
+//
+//        if (orderDTO.getPhone() != null) {
+//            orderDB.setPhone(orderDTO.getPhone());
+//        }
+//
+//
+//        return orderMapper.toDTOWithBooks(orderRepository.save(orderDB));
+//    }
 
 
 }

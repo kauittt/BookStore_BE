@@ -1,7 +1,6 @@
 package com.example.BookStore.mapstruct;
 
-import com.example.BookStore.DTO.BookDTO;
-import com.example.BookStore.DTO.CartDTO;
+import com.example.BookStore.DTO.*;
 import com.example.BookStore.model.*;
 import com.example.BookStore.repository.BookRepository;
 import com.example.BookStore.repository.UserRepository;
@@ -17,41 +16,37 @@ public interface CartMapper {
     CartMapper INSTANCE = Mappers.getMapper(CartMapper.class);
     BookMapper bookMapper = BookMapper.INSTANCE;
 
-    @Mapping(source = "user", target = "user", ignore = true)
     @Mapping(source = "cartBooks", target = "books", ignore = true)
-    CartDTO toDTO(Cart cart);
+    CartResponseDTO toDTO(Cart cart);
 
-    @Mapping(source = "user", target = "user", ignore = true)
-    @Mapping(source = "books", target = "cartBooks", ignore = true)
-    Cart toEntity(CartDTO cartDTO);
+    @Mapping(source = "bookIds", target = "cartBooks", ignore = true)
+    Cart toEntity(CartRequestDTO cartRequestDTO);
 
     //- Convert Order -> OrderDTO
     //! Dung khi RESPONSE
-    default CartDTO toDTOWithBooks(Cart cart) {
-        CartDTO cartDTO = toDTO(cart);
+    default CartResponseDTO toDTOWithBooks(Cart cart) {
+        CartResponseDTO cartResponseDTO = toDTO(cart);
 
-        List<BookDTO> bookDTOs = cart.getCartBooks().stream()
-                .map(cartBook -> bookMapper.toDTO(cartBook.getBook()))
-                .toList();
-        cartDTO.setBooks(bookDTOs);
+        List<CartBookDTO> bookDTOs = cart.getCartBooks().stream().map(cartBook -> new CartBookDTO(bookMapper.toDTO(cartBook.getBook()), cartBook.getQuantity())).toList();
 
-        return cartDTO;
+        cartResponseDTO.setBooks(bookDTOs);
+
+        return cartResponseDTO;
     }
 
     //- Convert OrderDTO -> Order
     //! Dùng khi REQUEST
-    default Cart toEntityWithBooks(CartDTO cartDTO, BookRepository bookRepository) {
-        Cart cart = toEntity(cartDTO);
+    default Cart toEntityWithBooks(CartRequestDTO cartRequestDTO, BookRepository bookRepository) {
+        Cart cart = toEntity(cartRequestDTO);
 
-        List<Book> books = bookMapper.toListEntity(cartDTO.getBooks(), bookRepository);
+        List<Book> books = bookMapper.toListEntity(cartRequestDTO.getBookIds(), bookRepository);
 
         for (int i = 0; i < books.size(); i++) {
             Book book = books.get(i);
-            int quantity = cartDTO.getQuantities().get(i);
+            int quantity = Integer.parseInt(cartRequestDTO.getQuantities().get(i));
 
             CartBookId cartBookId = new CartBookId(cart.getId(), book.getId());
             CartBook cartBook = new CartBook(cartBookId, cart, book, quantity);
-
 
             if (book.getCartBooks() == null) {
                 book.setCartBooks(new ArrayList<>());
@@ -67,11 +62,11 @@ public interface CartMapper {
         return cart;
     }
 
-    default Cart toEntityWithBooksAndUser(CartDTO cartDTO, BookRepository bookRepository, UserRepository userRepository) {
-        Cart cart = toEntityWithBooks(cartDTO, bookRepository);
+    default Cart toEntityWithBooksAndUser(CartRequestDTO cartRequestDTO, String userId, BookRepository bookRepository, UserRepository userRepository) {
+        Cart cart = toEntityWithBooks(cartRequestDTO, bookRepository);
 
-        User user = userRepository.findById(String.valueOf(cartDTO.getUser()))
-                .orElseThrow(() -> new RuntimeException(Response.notFound("User", String.valueOf(cartDTO.getUser()))));
+        User user = userRepository.findById(String.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException(Response.notFound("User", userId)));
 
         user.setCart(cart);
         cart.setUser(user);

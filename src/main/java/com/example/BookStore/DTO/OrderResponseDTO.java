@@ -10,24 +10,12 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponseDTO {
+public class OrderResponseDTO {
     private Integer id;
-
-    private String username;
-
-    private String email;
-
-    private String name;
-
-    private String phone;
-
-    private String address;
-
     private LocalDateTime dateCreate;
-
     private LocalDateTime dateUpdate;
-
-    private CartResponseDTO cart;
-
-    private List<OrderResponseDTO> orders;
+    private List<OrderBookDTO> books;
+    private String name;
+    private String phone;
+    private String address;
 }
