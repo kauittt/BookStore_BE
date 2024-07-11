@@ -5,10 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BookStoreApplication {
-	//! Cart-Book có thêm quantity k
 
-	public static void main(String[] args) {
-		SpringApplication.run(BookStoreApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BookStoreApplication.class, args);
+    }
 
 }

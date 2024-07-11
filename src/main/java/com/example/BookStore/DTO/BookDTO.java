@@ -20,6 +20,5 @@ public class BookDTO {
 
     private String author;
 
-    private int quantity;
-
+    private int quantity ;
 }

@@ -26,7 +26,10 @@ public class Cart {
 //    @JsonIgnore
     private User user;
 
-    @ManyToMany(mappedBy = "carts", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-//    @JsonManagedReference(value = "cart-book")
-    private List<Book> books;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartBook> cartBooks;
+
+//    @ManyToMany(mappedBy = "carts", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+////    @JsonManagedReference(value = "cart-book")
+//    private List<Book> books;
 }
