@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+//@CrossOrigin("http://localhost:5173")
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;

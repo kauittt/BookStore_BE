@@ -13,14 +13,19 @@ public interface UserMapper {
     CartMapper cartMapper = CartMapper.INSTANCE;
     OrderMapper orderMapper = OrderMapper.INSTANCE;
 
-    @Mapping(source = "cart", target = "cart", ignore = true)
-    @Mapping(source = "orders", target = "orders", ignore = true)
+//    @Mapping(source = "cart", target = "cart", ignore = true)
+//    @Mapping(source = "orders", target = "orders", ignore = true)
     UserResponseDTO toUserResponseDTO(User user);
 
+    @Mapping(source = "email", target = "email")
     User toEnity(UserRegistryDTO userRegistryDTO);
 
     default UserResponseDTO toUserResponseDTOFull(User user) {
         UserResponseDTO userResponseDTO = toUserResponseDTO(user);
+
+//        if (user.getOrders() == null) user.setOrders(new ArrayList<>());
+//        if (user.getCart() == null) user.setCart(new Cart());
+
         userResponseDTO.setCart(cartMapper.toDTOWithBooks(user.getCart()));
         userResponseDTO.setOrders(orderMapper.toListDTOWithBooks(user.getOrders()));
 

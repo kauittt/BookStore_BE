@@ -58,7 +58,7 @@ public class UserService {
         User user = findUserById(id);
 
         //- Cart
-        cartService.deleteCart(String.valueOf(user.getCart().getId()));
+        cartService.deleteCart(String.valueOf(user.getId()));
         user.setCart(null);
 
         //- Authority
@@ -107,7 +107,7 @@ public class UserService {
         user.setDateCreate(LocalDateTime.now());
         user.setDateUpdate(LocalDateTime.now());
         user.setEnabled(1);
-        user.setEmail("template@gmail.com");
+//        user.setEmail("template@gmail.com");
         user.setName("New user");
         user.setPhone("xxxxxxxxxx");
         user.setAddress("Template address");
