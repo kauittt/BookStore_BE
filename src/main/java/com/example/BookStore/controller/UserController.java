@@ -3,6 +3,7 @@ package com.example.BookStore.controller;
 import com.example.BookStore.DTO.JwtAuthResponse;
 import com.example.BookStore.DTO.UserRegistryDTO;
 import com.example.BookStore.DTO.UserResponseDTO;
+import com.example.BookStore.mapstruct.UserMapper;
 import com.example.BookStore.model.Response;
 import com.example.BookStore.security.JWTGenerator;
 import com.example.BookStore.service.CustomUserDetailsService;
@@ -27,6 +28,7 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
     private final CustomUserDetailsService customUserDetailsService;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Autowired
     public UserController(UserService userService, AuthenticationManager authenticationManager
@@ -36,22 +38,6 @@ public class UserController {
         this.jwtGenerator = jwtGenerator;
         this.customUserDetailsService = customUserDetailsService;
     }
-
-//    @PostMapping(value = "/login")
-//    public ResponseEntity<?> login(@RequestBody UserRegistryDTO userRegistryDTO) {
-//        try {
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(userRegistryDTO.getUsername(), userRegistryDTO.getPassword())
-//            );
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            String token = jwtGenerator.generateToken(authentication);
-//            return ResponseEntity.ok(new JwtAuthResponse(token));
-//        } catch (Exception ex) {
-//            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//        }
-//    }
 
     @PostMapping(value = "/login")
     public ResponseEntity<?> login(@RequestBody UserRegistryDTO userRegistryDTO) {
@@ -108,10 +94,21 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         try {
             UserResponseDTO userResponseDTO = userService.getUserById(id);
+            return ResponseEntity.ok(userResponseDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        try {
+            UserResponseDTO userResponseDTO = userMapper.toUserResponseDTOFull(userService.getUserByUsername(username));
             return ResponseEntity.ok(userResponseDTO);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());

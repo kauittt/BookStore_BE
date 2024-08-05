@@ -37,6 +37,17 @@ public class CartController {
         }
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> getCartByUsername(@PathVariable String username) {
+        try {
+            CartResponseDTO cartDTO = cartService.getCartByUsername(username);
+            return ResponseEntity.ok(cartDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateBooksByIds(@PathVariable String id, @RequestBody CartRequestDTO cartDTO) {
         try {

@@ -1,6 +1,7 @@
 package com.example.BookStore.controller;
 
 import com.example.BookStore.DTO.BookDTO;
+import com.example.BookStore.DTO.CategoryBooksDTO;
 import com.example.BookStore.model.Response;
 import com.example.BookStore.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,17 @@ public class BookController {
         try {
             BookDTO bookDTO = bookService.getBookById(id);
             return ResponseEntity.ok(bookDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/grouped")
+    public ResponseEntity<?> getBooksGroupedByCategory() {
+        try {
+            List<CategoryBooksDTO> books = bookService.getBooksGroupedByCategory();
+            return ResponseEntity.ok(books);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

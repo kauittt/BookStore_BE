@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public interface BookMapper {
     BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
 
+    @Mapping(source = "category", target = "category")
     BookDTO toDTO(Book book);
 
     Book toEntity(BookDTO bookDTO);

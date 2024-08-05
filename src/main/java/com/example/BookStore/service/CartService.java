@@ -50,6 +50,10 @@ public class CartService {
         return cartMapper.toDTOWithBooks(findCartById(id));
     }
 
+    public CartResponseDTO getCartByUsername(String username) {
+        return cartMapper.toDTOWithBooks(cartRepository.findCartByUsername(username));
+    }
+
     //! Cần tìm hiểu
     @Transactional
     public CartResponseDTO updateBooksByIds(String id, CartRequestDTO cartRequestDTO) {
