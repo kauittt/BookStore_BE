@@ -37,6 +37,17 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getOrderByUserId(@PathVariable String id) {
+        try {
+            List<OrderResponseDTO> orderDTO = orderService.getOrderByUserid(    id);
+            return ResponseEntity.ok(orderDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderRequestDTO orderDTO) {
         try {

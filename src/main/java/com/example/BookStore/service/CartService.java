@@ -170,5 +170,6 @@ public class CartService {
             book.getCartBooks().remove(cartBook);
             entityManager.remove(cartBook);
         }
+
     }
 }
