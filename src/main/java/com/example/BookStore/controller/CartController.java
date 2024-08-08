@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -37,9 +38,27 @@ public class CartController {
         }
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> getCartByUsername(@PathVariable String username) {
+        try {
+            CartResponseDTO cartDTO = cartService.getCartByUsername(username);
+            return ResponseEntity.ok(cartDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateBooksByIds(@PathVariable String id, @RequestBody CartRequestDTO cartDTO) {
         try {
+            // Sorting the bookIds list
+            List<String> sortedBookIds = cartDTO.getBookIds();
+            Collections.sort(sortedBookIds);
+
+            // Update the sorted list in the DTO
+            cartDTO.setBookIds(sortedBookIds);
+
             CartResponseDTO updatedCart = cartService.updateBooksByIds(id, cartDTO);
             return ResponseEntity.ok(updatedCart);
         } catch (Exception ex) {

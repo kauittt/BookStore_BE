@@ -22,7 +22,6 @@ public class Cart {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "userId")
-//    @JsonBackReference(value = "user-cart")
 //    @JsonIgnore
     private User user;
 

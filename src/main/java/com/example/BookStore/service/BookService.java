@@ -1,6 +1,7 @@
 package com.example.BookStore.service;
 
 import com.example.BookStore.DTO.BookDTO;
+import com.example.BookStore.DTO.CategoryBooksDTO;
 import com.example.BookStore.mapstruct.BookMapper;
 import com.example.BookStore.model.*;
 import com.example.BookStore.repository.BookRepository;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -93,4 +96,16 @@ public class BookService {
         bookRepository.delete(book);
         return bookMapper.toDTO(book);
     }
+
+    public List<CategoryBooksDTO> getBooksGroupedByCategory() {
+        List<BookDTO> books = this.getAllBooks();
+        Map<String, List<BookDTO>> groupedBooks = books.stream()
+                .filter(book -> book.getCategory() != null)
+                .collect(Collectors.groupingBy(BookDTO::getCategory));
+
+        return groupedBooks.entrySet().stream()
+                .map(entry -> new CategoryBooksDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
 }

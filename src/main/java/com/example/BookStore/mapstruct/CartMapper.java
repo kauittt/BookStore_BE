@@ -1,6 +1,8 @@
 package com.example.BookStore.mapstruct;
 
-import com.example.BookStore.DTO.*;
+import com.example.BookStore.DTO.CartBookDTO;
+import com.example.BookStore.DTO.CartRequestDTO;
+import com.example.BookStore.DTO.CartResponseDTO;
 import com.example.BookStore.model.*;
 import com.example.BookStore.repository.BookRepository;
 import com.example.BookStore.repository.UserRepository;
@@ -9,7 +11,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface CartMapper {
@@ -27,9 +31,17 @@ public interface CartMapper {
     default CartResponseDTO toDTOWithBooks(Cart cart) {
         CartResponseDTO cartResponseDTO = toDTO(cart);
 
-        List<CartBookDTO> bookDTOs = cart.getCartBooks().stream().map(cartBook -> new CartBookDTO(bookMapper.toDTO(cartBook.getBook()), cartBook.getQuantity())).toList();
+        if (cart.getCartBooks() == null) {
+            cartResponseDTO.setBooks(Collections.emptyList());
+        } else {
+            List<CartBookDTO> bookDTOs = cart.getCartBooks().stream()
+                    .filter(cartBook -> cartBook != null && cartBook.getBook() != null)  // Kiểm tra thêm null cho từng cartBook và cartBook.getBook()
+                    .map(cartBook -> new CartBookDTO(bookMapper.toDTO(cartBook.getBook()), cartBook.getQuantity()))
+                    .collect(Collectors.toList());
 
-        cartResponseDTO.setBooks(bookDTOs);
+
+            cartResponseDTO.setBooks(bookDTOs);
+        }
 
         return cartResponseDTO;
     }

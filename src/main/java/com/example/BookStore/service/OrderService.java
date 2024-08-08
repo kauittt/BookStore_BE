@@ -45,6 +45,11 @@ public class OrderService {
         return orderMapper.toDTOWithBooks(findOrderById(id));
     }
 
+    public List<OrderResponseDTO> getOrderByUserid(String id) {
+        List<Order> orders = orderRepository.findOrdersByUserId(id);
+        return orderMapper.toListDTOWithBooks(orders);
+    }
+
     @Transactional
     public OrderResponseDTO deleteOrder(String id) {
         Order order = findOrderById(id);

@@ -36,7 +36,7 @@ public class JWTGenerator {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 //        claims.put("customClaim", "customValue"); // Add custom claim
-
+    
 
         String token = Jwts.builder()
                 .setClaims(claims) // Set custom claims

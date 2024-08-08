@@ -23,6 +23,9 @@ public class Book {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "category")
+    private String category;
+
     @Column(name = "image")
     private String image;
 
