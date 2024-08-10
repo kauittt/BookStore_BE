@@ -45,8 +45,13 @@ public class OrderService {
         return orderMapper.toDTOWithBooks(findOrderById(id));
     }
 
-    public List<OrderResponseDTO> getOrderByUserid(String id) {
+    public List<OrderResponseDTO> getOrdersByUserid(String id) {
         List<Order> orders = orderRepository.findOrdersByUserId(id);
+        return orderMapper.toListDTOWithBooks(orders);
+    }
+
+    public List<OrderResponseDTO> getOrdersByUsername(String username) {
+        List<Order> orders = orderRepository.findOrdersByUsername(username);
         return orderMapper.toListDTOWithBooks(orders);
     }
 

@@ -12,8 +12,9 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
     CartMapper cartMapper = CartMapper.INSTANCE;
     OrderMapper orderMapper = OrderMapper.INSTANCE;
+    AuthorityMapper authorityMapper = AuthorityMapper.INSTANCE;
 
-//    @Mapping(source = "cart", target = "cart", ignore = true)
+    //    @Mapping(source = "cart", target = "cart", ignore = true)
 //    @Mapping(source = "orders", target = "orders", ignore = true)
     UserResponseDTO toUserResponseDTO(User user);
 
@@ -28,6 +29,7 @@ public interface UserMapper {
 
         userResponseDTO.setCart(cartMapper.toDTOWithBooks(user.getCart()));
         userResponseDTO.setOrders(orderMapper.toListDTOWithBooks(user.getOrders()));
+        userResponseDTO.setAuthorities(user.getAuthorities().stream().map(authorityMapper::todTO).toList());
 
         return userResponseDTO;
     }

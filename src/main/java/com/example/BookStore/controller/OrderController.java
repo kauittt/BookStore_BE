@@ -37,10 +37,21 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getOrderByUserId(@PathVariable String id) {
+    @GetMapping("/userId/{id}")
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable String id) {
         try {
-            List<OrderResponseDTO> orderDTO = orderService.getOrderByUserid(    id);
+            List<OrderResponseDTO> orderDTO = orderService.getOrdersByUserid(    id);
+            return ResponseEntity.ok(orderDTO);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> getOrdersByUsername(@PathVariable String username) {
+        try {
+            List<OrderResponseDTO> orderDTO = orderService.getOrdersByUsername(username);
             return ResponseEntity.ok(orderDTO);
         } catch (Exception ex) {
             Response response = Response.of(HttpStatus.NOT_FOUND, ex.getMessage());
