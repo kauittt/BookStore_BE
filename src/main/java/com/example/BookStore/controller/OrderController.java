@@ -81,16 +81,16 @@ public class OrderController {
         }
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> updateOrder(@PathVariable String id, @RequestBody OrderDTO orderDTO) {
-//        try {
-//            OrderDTO savedOrder = orderService.updateOrder(id, orderDTO);
-//            return ResponseEntity.ok(savedOrder);
-//        } catch (Exception ex) {
-//            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//        }
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable String id, @RequestBody OrderResponseDTO orderDTO) {
+        try {
+            OrderResponseDTO savedOrder = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(savedOrder);
+        } catch (Exception ex) {
+            Response response = Response.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 
 
 }
