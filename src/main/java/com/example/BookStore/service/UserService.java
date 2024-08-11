@@ -2,6 +2,7 @@ package com.example.BookStore.service;
 
 import com.example.BookStore.DTO.UserRegistryDTO;
 import com.example.BookStore.DTO.UserResponseDTO;
+import com.example.BookStore.mapstruct.AuthorityMapper;
 import com.example.BookStore.mapstruct.UserMapper;
 import com.example.BookStore.model.*;
 import com.example.BookStore.repository.AuthorityRepository;
@@ -20,17 +21,17 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper = UserMapper.INSTANCE;
+    private final AuthorityMapper authorityMapper = AuthorityMapper.INSTANCE;
     private final PasswordEncoder passwordEncoder;
-    private final AuthorityRepository authorityRepository;
     private final CartService cartService;
     private final OrderService orderService;
-
+    private final AuthorityRepository authorityRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CartService cartService, OrderService orderService) {
+    public UserService(AuthorityRepository authorityRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, CartService cartService, OrderService orderService) {
+        this.authorityRepository = authorityRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.authorityRepository = authorityRepository;
         this.cartService = cartService;
         this.orderService = orderService;
     }
@@ -95,7 +96,33 @@ public class UserService {
         if (userResponseDTO.getAddress() != null) {
             user.setAddress(userResponseDTO.getAddress());
         }
+        if (userResponseDTO.getAuthorities() != null) {
+            // Step 1: Convert the incoming list of AuthorityDTO to a list of Authority entities
+            List<Authority> updatedAuthorities = userResponseDTO.getAuthorities().stream()
+                    .map(dto -> authorityRepository.findById(String.valueOf(dto.getId()))
+                            .orElseThrow(() -> new RuntimeException("Authority not found with ID: " + dto.getId())))
+                    .toList();
 
+            // Step 2: Remove authorities that are no longer associated with the user
+            List<Authority> authoritiesToRemove = user.getAuthorities().stream()
+                    .filter(auth -> !updatedAuthorities.contains(auth))
+                    .toList();
+
+            for (Authority authority : authoritiesToRemove) {
+                authority.getUsers().remove(user); // Remove the user from the authority's list of users
+                user.getAuthorities().remove(authority); // Remove the authority from the user's list of authorities
+            }
+
+            // Step 3: Add new authorities to the user
+            for (Authority authority : updatedAuthorities) {
+                if (!user.getAuthorities().contains(authority)) {
+                    user.getAuthorities().add(authority);
+                    authority.getUsers().add(user);
+                }
+            }
+        }
+
+        // Save the user with updated authorities
         return userMapper.toUserResponseDTOFull(userRepository.save(user));
     }
 

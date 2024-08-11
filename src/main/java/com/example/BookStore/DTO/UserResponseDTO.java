@@ -27,6 +27,8 @@ public class UserResponseDTO {
 
     private LocalDateTime dateUpdate;
 
+    private List<AuthorityDTO> authorities;
+
     private CartResponseDTO cart;
 
     private List<OrderResponseDTO> orders;

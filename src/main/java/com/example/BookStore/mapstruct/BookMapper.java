@@ -21,6 +21,7 @@ public interface BookMapper {
     @Mapping(source = "category", target = "category")
     BookDTO toDTO(Book book);
 
+    @Mapping(source = "category", target = "category")
     Book toEntity(BookDTO bookDTO);
 
     @Mapping(source = "quantity", target = "cartQuantity")

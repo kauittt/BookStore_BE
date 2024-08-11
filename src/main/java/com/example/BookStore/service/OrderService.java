@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -45,8 +46,13 @@ public class OrderService {
         return orderMapper.toDTOWithBooks(findOrderById(id));
     }
 
-    public List<OrderResponseDTO> getOrderByUserid(String id) {
+    public List<OrderResponseDTO> getOrdersByUserid(String id) {
         List<Order> orders = orderRepository.findOrdersByUserId(id);
+        return orderMapper.toListDTOWithBooks(orders);
+    }
+
+    public List<OrderResponseDTO> getOrdersByUsername(String username) {
+        List<Order> orders = orderRepository.findOrdersByUsername(username);
         return orderMapper.toListDTOWithBooks(orders);
     }
 
@@ -80,24 +86,28 @@ public class OrderService {
         return orderMapper.toDTOWithBooks(orderRepository.save(order));
     }
 
-//    @Transactional
-//    public OrderResponseDTO updateOrder(String id, OrderRequestDTO orderDTO) {
-//        Order orderDB = findOrderById(id);
-//
-//        orderDB.setDateUpdate(LocalDateTime.now());
-//
-//        //- Chỉ update 2 fields
-//        if (orderDTO.g() != null) {
-//            orderDB.setName(orderDTO.getName());
-//        }
-//
-//        if (orderDTO.getPhone() != null) {
-//            orderDB.setPhone(orderDTO.getPhone());
-//        }
-//
-//
-//        return orderMapper.toDTOWithBooks(orderRepository.save(orderDB));
-//    }
+    @Transactional
+    public OrderResponseDTO updateOrder(String id, OrderResponseDTO orderDTO) {
+        // Fetch the existing order from the database
+        Order orderDB = findOrderById(id);
+
+        // Update the date of update
+        orderDB.setDateUpdate(LocalDateTime.now());
+
+        // Only update the fields if they are provided in the DTO
+        if (orderDTO.getName() != null) {
+            orderDB.setName(orderDTO.getName());
+        }
+        if (orderDTO.getPhone() != null) {
+            orderDB.setPhone(orderDTO.getPhone());
+        }
+        if (orderDTO.getAddress() != null) {
+            orderDB.setAddress(orderDTO.getAddress());
+        }
+
+        // Save the updated order back to the repository and map it to DTO
+        return orderMapper.toDTOWithBooks(orderRepository.save(orderDB));
+    }
 
 
 }
