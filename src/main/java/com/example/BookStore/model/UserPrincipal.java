@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+//- UserPrincipal là một lớp bao bọc (wrapper) cho thực thể User.
+//- Vì trong CustomUserDetailsService cần UserDetails nên cần bộc lại để cho tiện .get và .set
 public class UserPrincipal implements UserDetails {
     private final User user;
 

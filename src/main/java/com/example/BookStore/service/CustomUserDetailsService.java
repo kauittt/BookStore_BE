@@ -23,6 +23,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userService = userService;
     }
 
+    //- Việc triển khai các interface GrantedAuthority trong lớp Authority và UserDetails trong lớp UserPrincipal
+    //- giúp cho việc sử dụng CustomUserDetailsService dễ dàng hơn và đồng thời tuân thủ đúng các yêu cầu của Spring Security.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.getUserByUsername(username);

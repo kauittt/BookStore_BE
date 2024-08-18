@@ -32,15 +32,15 @@ public class JWTGenerator {
 
         //- Add custom claims (payload)
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+//        claims.put("roles", authentication.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.toList()));
 //        claims.put("customClaim", "customValue"); // Add custom claim
-    
+
 
         String token = Jwts.builder()
                 .setClaims(claims) // Set custom claims
-                .setSubject(username)
+                .setSubject(username) //- setSubject để getUsernameFromJWT có thể .getSubject
                 .setIssuedAt(currentDate)
                 .setExpiration(expireDate)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -69,6 +69,7 @@ public class JWTGenerator {
         return refreshToken;
     }
 
+    //- .getSubject() = username
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(key)
@@ -78,6 +79,7 @@ public class JWTGenerator {
         return claims.getSubject();
     }
 
+    //- Khi cần dùng refreshToken thì xem lại: khi generate đã có field "roles" chưa
     public List<GrantedAuthority> getAuthoritiesFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(key)

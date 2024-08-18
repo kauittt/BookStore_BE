@@ -15,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "authorities")
+//- Khi bạn gọi getAuthorities() trong UserPrincipal, bạn đang trả về một danh sách các Authority đã được chuyển đổi thành danh sách các GrantedAuthority.
+// -Điều này giúp Spring Security hiểu được các quyền của người dùng một cách trực tiếp mà không cần thêm bất kỳ chuyển đổi nào.
 public class Authority implements GrantedAuthority {
     @Id
     @Column(name = "id")

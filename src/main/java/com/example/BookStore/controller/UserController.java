@@ -6,7 +6,6 @@ import com.example.BookStore.DTO.UserResponseDTO;
 import com.example.BookStore.mapstruct.UserMapper;
 import com.example.BookStore.model.Response;
 import com.example.BookStore.security.JWTGenerator;
-import com.example.BookStore.service.CustomUserDetailsService;
 import com.example.BookStore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,21 +26,26 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
-    private final CustomUserDetailsService customUserDetailsService;
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Autowired
     public UserController(UserService userService, AuthenticationManager authenticationManager
-            , JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService) {
+            , JWTGenerator jwtGenerator) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtGenerator = jwtGenerator;
-        this.customUserDetailsService = customUserDetailsService;
     }
 
     @PostMapping(value = "/login")
     public ResponseEntity<?> login(@RequestBody UserRegistryDTO userRegistryDTO) {
         try {
+            //! Qua BookStoreConfig xem 2 method
+            //- authenticationManager mà bạn sử dụng trong UserController được lấy từ phương thức authenticationManager() trong cấu hình bảo mật (BookStoreConfig).
+            //- AuthenticationManager sẽ sử dụng một hoặc nhiều AuthenticationProvider để thực hiện quá trình xác thực.
+            //- Trong trường hợp của bạn, DaoAuthenticationProvider được cấu hình và sử dụng.
+
+            //- DaoAuthenticationProvider sử dụng CustomUserDetailsService để tải thông tin người dùng từ cơ sở dữ
+            //- dựa trên username mà người dùng cung cấp trong yêu cầu đăng nhập.
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userRegistryDTO.getUsername(), userRegistryDTO.getPassword())
             );

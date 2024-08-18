@@ -39,9 +39,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 String username = tokenGenerator.getUsernameFromJWT(token);
 
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+
+                //- Mục đích: Đoạn mã này tạo ra một đối tượng UsernamePasswordAuthenticationToken (đây là một lớp con của Authentication)
+                //- chứa thông tin về người dùng đã xác thực,
+                //- bao gồm chi tiết về tên đăng nhập và các quyền của họ.
+                //- Vì đã tokenGenerator.validateToken(token) nên không truyền para2 (password)
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                         userDetails.getAuthorities());
+
+
+                //- Mục đích: Dòng mã này được sử dụng để gán các thông tin bổ sung về yêu cầu HTTP hiện tại (request) vào đối tượng UsernamePasswordAuthenticationToken.
+                //- Kết quả: Sau dòng này, UsernamePasswordAuthenticationToken không chỉ chứa thông tin về người dùng và quyền hạn của họ,
+                //- mà còn có các chi tiết cụ thể liên quan đến yêu cầu HTTP đã khởi tạo quá trình xác thực.
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                //- Mục đích: Dòng mã này được sử dụng để lưu trữ đối tượng xác thực authenticationToken trong SecurityContext của Spring Security,
+                //- giúp hệ thống biết rằng người dùng hiện tại đã được xác thực.
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception ex) {
@@ -50,6 +63,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    //- Helper
     private String getJWTFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -58,6 +72,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
+    //- phương thức shouldNotFilter: Bạn có thể cho phép truy cập tự do (không cần JWT) vào các endpoint như /users/login và /users/register,
+    //- để người dùng có thể đăng nhập và đăng ký.
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
